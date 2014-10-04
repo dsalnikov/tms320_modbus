@@ -6,7 +6,7 @@
  */
 #include "modbus_slave.h"
 #include "crc16.h"
-#include "parameters.h"
+#include "ParametersTable.h"
 
 Uint16 modbus_func(Uint16 *Buffer, Uint16 len, Uint16 ModbusAddress)
 {
@@ -44,16 +44,21 @@ Uint16 modbus_func(Uint16 *Buffer, Uint16 len, Uint16 ModbusAddress)
 Uint16 modbus_0x03_func(Uint16 *Buffer, Uint16 len)
 {
 	Uint16 Addr, size, tmp, s_tmp;
+	const Parameter_type *parameter;
+
+	Addr = (Buffer[2] << 8) | Buffer[3];
+	size = (Buffer[4] << 8) | Buffer[5];
 
 	// проверка доступности адреса
+	if (Addr > ParametersNumber)
+		return modbus_error(Buffer, MODBUS_ADDRESS_ERROR);
 
+	parameter = &ParametersTable[Addr];
 
 	// проверка читаемости регистра
 	if (parameter->Flags.bit.r != 1)
 		return modbus_error(Buffer, MODBUS_DATA_VALUE_ERROR);
 
-	Addr = (Buffer[2] << 8) | Buffer[3];
-	size = (Buffer[4] << 8) | Buffer[5];
 
 	// кладем в буфер Uart количество переменных
 	Buffer[2] = size;
@@ -79,6 +84,8 @@ Uint16 modbus_0x06_func(Uint16 *Buffer, Uint16 len)
 	Value = (Buffer[4] << 8) | Buffer[5];
 
 	// проверка доступности адреса
+	if (Addr > ParametersNumber)
+		return modbus_error(Buffer, MODBUS_ADDRESS_ERROR);
 
 	parameter = &ParametersTable[Addr];
 
