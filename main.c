@@ -1,7 +1,8 @@
 /**
- * Пример использования UART без прерываний
+ * Пример простейшей реализации Modbus RTU
  * @autor lamazavr
- * @date 21.09.2014
+ * @url how2.org.ua
+ * @date 04.10.2014
  */
 #include "DSP28x_Project.h"
 
@@ -26,7 +27,6 @@ Uint16 UartBuffer[50];
 
 void main(void)
 {
-	Uint16 ReceivedChar;
 	char *msg;
 
 	InitSysCtrl();
@@ -46,29 +46,21 @@ void main(void)
 	scia_fifo_init();      // настройка SCI FIFO
 	scia_echoback_init();  // настройка SCI
 
-	msg = "Hello World!\0";
-	scia_msg(msg);
+	// разрешаем прерывание по приему данных по uart
+	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;
+	PieCtrlRegs.PIEIER9.bit.INTx1 = 1;
 
-	msg = "\r\nYou will enter a character, and the DSP will echo it back! \n";
-	scia_msg(msg);
+	IER |= M_INT1; // Разрешаем прерывание ядра по линии 1
+	EINT;          // Разрешаем прерывания глобально
 
-    for(;;)
+    msg = "\r\nEnter a character:";
+    scia_msg(msg);
+
+	for(;;)
     {
-       msg = "\r\nEnter a character:";
-       scia_msg(msg);
-
-       // ждем пока не появятся данные
-       while(SciaRegs.SCIFFRX.bit.RXFFST != 1) { } // ждем XRDY
-
-       // Получаем символ
-       ReceivedChar = SciaRegs.SCIRXBUF.all;
-
-       // Отправляем обратно
-       msg = "  You sent: ";
-       scia_msg(msg);
-       scia_xmit(ReceivedChar);
-
        LoopCount++;
+
+       DELAY_US(100);
     }
 
 }
@@ -82,8 +74,9 @@ void scia_echoback_init()
                                    // без проверки четности, 8 бит,
                                    // асинхронная передача
 
-    SciaRegs.SCICTL1.all =0x0003;  // вкл TX, RX, internal SCICLK,
+    SciaRegs.SCICTL1.all =0x0043;  // вкл TX, RX, internal SCICLK,
                                    // откл RX ERR, SLEEP, TXWAKE
+    							   // RX interrupt
 
     SciaRegs.SCICTL2.bit.TXINTENA = 1;
     SciaRegs.SCICTL2.bit.RXBKINTENA = 1;

@@ -590,6 +590,9 @@ interrupt void SCIRXINTA_ISR(void)     // SCI-A
 {
   // Insert ISR Code here
 
+	// Получаем символ
+	Uint16 ReceivedChar = SciaRegs.SCIRXBUF.all;
+
   // To receive more interrupts from this PIE group, acknowledge this interrupt
   // PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;
 

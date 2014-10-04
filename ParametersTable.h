@@ -17,6 +17,7 @@ Parameter_type ParametersTable[] =
 	{&TestPrm, 		0, 	0xFFFF, READ_PARAMETER_FLAG | WRITE_PARAMETER_FLAG	},
 };
 
-#define	ParametersNumber (sizeof(ParametersTable)/sizeof(Parameter_type))
+// количество параметров
+#define	ParametersCount (sizeof(ParametersTable)/sizeof(Parameter_type))
 
 #endif /* PARAMETERSTABLE_H_ */

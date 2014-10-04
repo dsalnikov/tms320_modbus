@@ -50,7 +50,7 @@ Uint16 modbus_0x03_func(Uint16 *Buffer, Uint16 len)
 	size = (Buffer[4] << 8) | Buffer[5];
 
 	// проверка доступности адреса
-	if (Addr > ParametersNumber)
+	if (Addr > ParametersCount)
 		return modbus_error(Buffer, MODBUS_ADDRESS_ERROR);
 
 	parameter = &ParametersTable[Addr];
@@ -84,7 +84,7 @@ Uint16 modbus_0x06_func(Uint16 *Buffer, Uint16 len)
 	Value = (Buffer[4] << 8) | Buffer[5];
 
 	// проверка доступности адреса
-	if (Addr > ParametersNumber)
+	if (Addr > ParametersCount)
 		return modbus_error(Buffer, MODBUS_ADDRESS_ERROR);
 
 	parameter = &ParametersTable[Addr];
@@ -104,5 +104,13 @@ Uint16 modbus_0x06_func(Uint16 *Buffer, Uint16 len)
 
 	// ответ - копия запроса
 	return 6;
+}
+
+Uint16 modbus_error(Uint16 *Buffer, Uint16 err)
+{
+	Buffer[1] |= 0x80;
+	Buffer[2] = err;
+
+	return 3;
 }
 
