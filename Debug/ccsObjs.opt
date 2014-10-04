@@ -1,1 +1,0 @@
-"./DSP2802x_CodeStartBranch.obj" "./DSP2802x_DefaultIsr.obj" "./DSP2802x_EPwm.obj" "./DSP2802x_GlobalVariableDefs.obj" "./DSP2802x_PieCtrl.obj" "./DSP2802x_PieVect.obj" "./DSP2802x_SysCtrl.obj" "./DSP2802x_usDelay.obj" "./main.obj" "./inc/DSP2802x_CpuTimers.obj" "../28027_RAM_lnk.cmd" "../DSP2802x_Headers_nonBIOS.cmd" -l"libc.a" 
