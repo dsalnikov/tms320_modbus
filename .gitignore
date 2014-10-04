@@ -1,2 +1,3 @@
 *.obj
 [Dd]ebug*/
+.launches/
