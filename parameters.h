@@ -36,12 +36,7 @@ typedef struct {
 }Parameter_type;
 
 
-// тестовая таблица параметров
-Parameter_type ParametersTabele[] =
-{
-	{&LedsState,	0,	0xFF,	READ_PARAMETER_FLAG						 	},
-	{&TestPrm, 		0, 	0xFFFF, READ_PARAMETER_FLAG | WRITE_PARAMETER_FLAG	},
-};
+extern Parameter_type ParametersTable[];
 
 
 #endif /* PARAMETERS_H_ */

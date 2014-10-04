@@ -10,7 +10,7 @@
 
 #include "DSP2802x_Device.h"
 
-
+Uint16 Crc16(Uint16 *Bff, Uint16 szBff);
 
 
 #endif /* CRC16_H_ */
