@@ -17,9 +17,11 @@ Uint16 LoopCount;
 
 #include "parameters.h"
 
+// две переменные для теста
 Uint16 LedsState;
 Uint16 TestPrm;
 
+// буфер для modbus
 Uint16 UartBuffer[50];
 
 void main(void)
