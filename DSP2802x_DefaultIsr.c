@@ -24,6 +24,9 @@
 #include "DSP2802x_Device.h"     // DSP2802x Headerfile Include File
 #include "DSP2802x_Examples.h"   // DSP2802x Examples Include File
 
+extern Uint16 UartBuffer[50];
+Uint16 UartRxLen = 0;
+
 // Connected to INT13 of CPU (use MINT13 mask):
 interrupt void INT13_ISR(void)     // INT13 or CPU-Timer1
 {
@@ -588,19 +591,21 @@ interrupt void I2CINT2A_ISR(void)     // I2C-A
 // INT9.1
 interrupt void SCIRXINTA_ISR(void)     // SCI-A
 {
-  // Insert ISR Code here
+	int i;
 
-	// Получаем символ
-	Uint16 ReceivedChar = SciaRegs.SCIRXBUF.all;
+	// если достигли конца буфера
+	if (UartRxLen > 50 - 2)
+		UartRxLen = 0;
 
-  // To receive more interrupts from this PIE group, acknowledge this interrupt
-  // PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;
-
-  // Next two lines for debug only to halt the processor here
-  // Remove after inserting ISR Code
-  asm ("      ESTOP0");
-  for(;;);
-
+	// Получаем 2 символа
+	for (i=0;i<2;i++)
+	{
+		UartBuffer[UartRxLen++] = SciaRegs.SCIRXBUF.all;
+	}
+	SciaRegs.SCIFFRX.bit.RXFFOVRCLR=1;   // Clear Overflow flag
+	SciaRegs.SCIFFRX.bit.RXFFINTCLR=1;   // Clear Interrupt flag
+	// To receive more interrupts from this PIE group, acknowledge this interrupt
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;
 }
 
 // INT9.2

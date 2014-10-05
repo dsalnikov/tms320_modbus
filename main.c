@@ -7,8 +7,7 @@
 #include "DSP28x_Project.h"
 
 // прототипы
-void scia_echoback_init(void);
-void scia_fifo_init(void);
+void scia_init(void);
 void scia_xmit(int a);
 void scia_msg(char *msg);
 void scia_init_gpio();
@@ -43,14 +42,13 @@ void main(void)
 
 	LoopCount = 0;
 
-	scia_fifo_init();      // настройка SCI FIFO
-	scia_echoback_init();  // настройка SCI
+	scia_init();  // настройка SCI
 
 	// разрешаем прерывание по приему данных по uart
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;
 	PieCtrlRegs.PIEIER9.bit.INTx1 = 1;
 
-	IER |= M_INT1; // Разрешаем прерывание ядра по линии 1
+	IER |= M_INT9; // Разрешаем прерывание ядра по линии 9
 	EINT;          // Разрешаем прерывания глобально
 
     msg = "\r\nEnter a character:";
@@ -65,7 +63,7 @@ void main(void)
 
 }
 
-void scia_echoback_init()
+void scia_init()
 {
     // Тактирование модуля было включено в
 	// InitSysCtrl() --> InitPeripheralClocks()
@@ -81,6 +79,10 @@ void scia_echoback_init()
     SciaRegs.SCICTL2.bit.TXINTENA = 1;
     SciaRegs.SCICTL2.bit.RXBKINTENA = 1;
 
+    SciaRegs.SCIFFTX.all=0xC022;
+    SciaRegs.SCIFFRX.all=0x0022;
+    SciaRegs.SCIFFCT.all=0x00;
+
     // SCI BRR = LSPCLK/(SCI BAUDx8) - 1
 
     // 9600 бод
@@ -93,6 +95,8 @@ void scia_echoback_init()
 	SciaRegs.SCILBAUD    = 0x0006;  // для 256000 бод
 
     SciaRegs.SCICTL1.all = 0x0023;  // Relinquish SCI from Reset
+    SciaRegs.SCIFFTX.bit.TXFIFOXRESET=1;
+    SciaRegs.SCIFFRX.bit.RXFIFORESET=1;
 }
 
 /**
@@ -110,17 +114,6 @@ void scia_msg(char *msg)
     {
         scia_xmit(*msg++);
     }
-}
-
-void scia_fifo_init()
-{
-    SciaRegs.SCIFFTX.bit.SCIRST = 1; 		// сброс линий rx/tx
-	SciaRegs.SCIFFTX.bit.SCIFFENA = 1;		// разрешаем FIFO
-	SciaRegs.SCIFFTX.bit.TXFIFOXRESET = 1;	// сбрасываем FIFO
-	SciaRegs.SCIFFTX.bit.TXFFINTCLR = 1;	// очищаем флаг прерывания
-
-	// дублирует то, что выше одной строкой
-	//SpiaRegs.SPIFFTX.all=0xE040;
 }
 
 void scia_init_gpio()
