@@ -72,7 +72,7 @@ Uint16 modbus_0x03_func(Uint16 *Buffer, Uint16 len)
 	}
 	// возвращаем длину посылки
 	// адрес + функция + количество данных + данные
-	return (3+s_tmp);
+	return (3 + s_tmp*2);
 }
 
 Uint16 modbus_0x06_func(Uint16 *Buffer, Uint16 len)

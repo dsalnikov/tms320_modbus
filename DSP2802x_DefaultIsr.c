@@ -24,8 +24,7 @@
 #include "DSP2802x_Device.h"     // DSP2802x Headerfile Include File
 #include "DSP2802x_Examples.h"   // DSP2802x Examples Include File
 
-extern Uint16 UartBuffer[50];
-Uint16 UartRxLen = 0;
+#include "Uart.h"
 
 // Connected to INT13 of CPU (use MINT13 mask):
 interrupt void INT13_ISR(void)     // INT13 or CPU-Timer1
@@ -602,6 +601,10 @@ interrupt void SCIRXINTA_ISR(void)     // SCI-A
 	{
 		UartBuffer[UartRxLen++] = SciaRegs.SCIRXBUF.all;
 	}
+
+	// сбрасываем таймер
+	CpuTimer0.RegsAddr->TCR.bit.TRB = 1;
+
 	SciaRegs.SCIFFRX.bit.RXFFOVRCLR=1;   // Clear Overflow flag
 	SciaRegs.SCIFFRX.bit.RXFFINTCLR=1;   // Clear Interrupt flag
 	// To receive more interrupts from this PIE group, acknowledge this interrupt

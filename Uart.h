@@ -10,6 +10,9 @@
 
 #include "DSP2802x_Device.h"
 
+extern Uint16 UartBuffer[];
+extern Uint16 UartRxLen;
+
 /**
  * Инициализация передатчика
  */
@@ -32,6 +35,14 @@ void Uart_send(Uint16 a);
  */
 void Uart_send_msg(char *msg);
 
+/**
+ * Настройка таймера ожидания посылки
+ */
+void Uart_timer_init();
 
+/**
+ * Прерывания по переполнению таймера
+ */
+interrupt void cpu_timer0_isr(void);
 
 #endif /* UART_H_ */

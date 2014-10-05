@@ -17,10 +17,14 @@ Uint16 LoopCount;
 
 #include "parameters.h"
 #include "Uart.h"
+#include "modbus_slave.h"
 
 // две переменные для теста
 Uint16 LedsState;
 Uint16 TestPrm;
+
+
+
 
 void main(void)
 {
@@ -36,7 +40,6 @@ void main(void)
 	// настраиваем SCI
 	Uart_init();
 
-	IER |= M_INT9; // Разрешаем прерывание ядра по линии 9
 	EINT;          // Разрешаем прерывания глобально
 
 	char *msg = "\r\nEnter a character:";

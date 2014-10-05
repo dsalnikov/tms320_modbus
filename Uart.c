@@ -6,9 +6,13 @@
  */
 
 #include "Uart.h"
+#include "modbus_slave.h"
 
 // буфер дл€ modbus
 Uint16 UartBuffer[50];
+
+// количество данных в буфере
+Uint16 UartRxLen = 0;
 
 void Uart_init()
 {
@@ -50,6 +54,10 @@ void Uart_init()
     // разрешаем прерывание по приему данных по uart
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;
 	PieCtrlRegs.PIEIER9.bit.INTx1 = 1;
+
+	IER |= M_INT9; // –азрешаем прерывание €дра по линии 9
+
+	Uart_timer_init();
 }
 
 void Uart_init_gpio()
@@ -75,4 +83,43 @@ void Uart_send_msg(char *msg)
     {
     	Uart_send(*msg++);
     }
+}
+
+void Uart_timer_init()
+{
+	EALLOW;
+	PieVectTable.TINT0 = &cpu_timer0_isr;
+	EDIS;
+
+	InitCpuTimers();
+	ConfigCpuTimer(&CpuTimer0, 60, 300000); // 300ms
+
+	CpuTimer0Regs.TCR.all = 0x4001;
+	IER |= M_INT1;
+
+	// Enable TINT0 in the PIE: Group 1 interrupt 7
+	PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
+}
+
+interrupt void cpu_timer0_isr(void)
+{
+	// stop timer
+	CpuTimer0.RegsAddr->TCR.bit.TSS = 1;
+
+	if (UartRxLen > 0)
+	{
+	   Uint16 len = modbus_func(UartBuffer, UartRxLen, 2);
+	   Uint16 i = 0;
+	   for (; i <= len; i++)
+	   {
+		   Uart_send(UartBuffer[i]);
+	   }
+	   UartRxLen = 0;
+	}
+
+	// start timer
+	CpuTimer0.RegsAddr->TCR.bit.TSS = 0;
+
+	// Acknowledge this interrupt to receive more interrupts from group 1
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
