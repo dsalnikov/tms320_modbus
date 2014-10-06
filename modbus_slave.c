@@ -93,7 +93,7 @@ Uint16 modbus_0x06_func(Uint16 *Buffer, Uint16 len)
 	if (parameter->Flags.bit.w == 1)
 	{
 		// проверяем пределы
-		if (Value > parameter->LowerLimit && Value < parameter->UpperLimit)
+		if (Value >= parameter->LowerLimit && Value <= parameter->UpperLimit)
 		{
 			// записываем
 			*(parameter->Addr) = Value;

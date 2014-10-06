@@ -110,6 +110,7 @@ interrupt void cpu_timer0_isr(void)
 	{
 	   Uint16 len = modbus_func(UartBuffer, UartRxLen, 2);
 	   Uint16 i = 0;
+	   //TODO: изменить на прерывание
 	   for (; i <= len; i++)
 	   {
 		   Uart_send(UartBuffer[i]);

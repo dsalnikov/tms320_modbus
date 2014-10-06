@@ -13,7 +13,7 @@
 // тестовая таблица параметров
 Parameter_type ParametersTable[] =
 {
-	{&LedsState,	0,	0xFF,	READ_PARAMETER_FLAG						 	},
+	{&LedsState,	0,	0xFF,	READ_PARAMETER_FLAG | WRITE_PARAMETER_FLAG	},
 	{&TestPrm, 		0, 	0xFFFF, READ_PARAMETER_FLAG | WRITE_PARAMETER_FLAG	},
 };
 
