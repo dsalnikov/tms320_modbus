@@ -92,7 +92,7 @@ void Uart_timer_init()
 	EDIS;
 
 	InitCpuTimers();
-	ConfigCpuTimer(&CpuTimer0, 60, 300000); // 300ms
+	ConfigCpuTimer(&CpuTimer0, 60, 30000); // 30ms
 
 	CpuTimer0Regs.TCR.all = 0x4001;
 	IER |= M_INT1;
@@ -106,18 +106,23 @@ interrupt void cpu_timer0_isr(void)
 	// stop timer
 	CpuTimer0.RegsAddr->TCR.bit.TSS = 1;
 
+	// запрещаем прерывания на время обработки и передачи
+	DINT;
+
 	if (UartRxLen > 0)
 	{
 	   Uint16 len = modbus_func(UartBuffer, UartRxLen, 2);
 	   Uint16 i = 0;
 	   //TODO: изменить на прерывание
-	   for (; i <= len; i++)
+	   for (i = 0; i < len; i++)
 	   {
 		   Uart_send(UartBuffer[i]);
 	   }
 	   UartRxLen = 0;
 	}
 
+	// разрешаем прерывания
+	EINT;
 	// start timer
 	CpuTimer0.RegsAddr->TCR.bit.TSS = 0;
 

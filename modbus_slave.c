@@ -32,6 +32,9 @@ Uint16 modbus_func(Uint16 *Buffer, Uint16 len, Uint16 ModbusAddress)
 		case 0x06:
 			len = modbus_0x06_func(Buffer, len);
 		break;
+
+		default:
+			len = modbus_error(Buffer,MODBUS_FUNCTION_ERROR);
 	}
 	// добавляем к посылке CRC
 	tmp = Crc16(Buffer,len);
